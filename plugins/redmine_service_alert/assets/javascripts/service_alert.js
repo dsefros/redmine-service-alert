@@ -1,34 +1,36 @@
 (function () {
-  function initServiceAlertModal() {
+  function init() {
     var modal = document.getElementById('service-alert-modal');
     if (!modal) return;
 
-    var enabled = modal.dataset.enabled === 'true';
-    var showPopup = modal.dataset.showPopup === 'true';
     var version = modal.dataset.version || '0';
+    var key = 'service_alert_seen_' + version;
 
-    if (!enabled || !showPopup) return;
-
-    var storageKey = 'service_alert_seen_version_' + version;
-    if (window.sessionStorage.getItem(storageKey)) {
-      modal.style.display = 'none';
-      return;
-    }
+    if (sessionStorage.getItem(key)) return;
 
     modal.style.display = 'flex';
 
-    var closeButton = modal.querySelector('.service-alert-modal-close');
-    if (closeButton) {
-      closeButton.addEventListener('click', function () {
-        window.sessionStorage.setItem(storageKey, '1');
-        modal.style.display = 'none';
-      });
+    function close() {
+      sessionStorage.setItem(key, '1');
+      modal.style.display = 'none';
     }
+
+    var btn = modal.querySelector('.service-alert-modal-dismiss');
+    if (btn) {
+      btn.addEventListener('click', close);
+    }
+
+    // (опционально) клик по фону тоже закрывает
+    modal.addEventListener('click', function (e) {
+      if (e.target === modal) {
+        close();
+      }
+    });
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initServiceAlertModal);
+    document.addEventListener('DOMContentLoaded', init);
   } else {
-    initServiceAlertModal();
+    init();
   }
 })();

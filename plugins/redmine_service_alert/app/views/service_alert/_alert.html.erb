@@ -1,22 +1,41 @@
-<% defaults = Redmine::Plugin.find(:redmine_service_alert).settings[:default] %>
-<% raw_settings = defaults.merge(Setting.plugin_redmine_service_alert || {}) %>
-<% enabled = (raw_settings['enabled'] == true || raw_settings['enabled'].to_s == 'true' || raw_settings['enabled'].to_s == '1') %>
-<% show_popup = (raw_settings['show_popup'] == true || raw_settings['show_popup'].to_s == 'true' || raw_settings['show_popup'].to_s == '1') %>
-<% severity = raw_settings['severity'].to_s %>
-<% title = raw_settings['title'].to_s %>
-<% message = raw_settings['message'].to_s %>
-<% link_url = raw_settings['link_url'].to_s %>
-<% version = raw_settings['version'].to_i %>
+<%
+defaults = Redmine::Plugin.find(:redmine_service_alert).settings[:default]
+settings = defaults.merge(Setting.plugin_redmine_service_alert || {})
+
+to_bool = ->(value) { value == true || %w[true 1].include?(value.to_s) }
+
+enabled    = to_bool.call(settings['enabled'])
+show_popup = to_bool.call(settings['show_popup'])
+severity   = settings['severity'].to_s
+title      = settings['title'].to_s
+message    = settings['message'].to_s
+link_url   = settings['link_url'].to_s
+version    = settings['version'].to_i
+%>
 
 <% if enabled %>
-  <div class="service-alert-banner service-alert-<%= severity %>" role="status" aria-live="polite">
-    <strong class="service-alert-title"><%= h(title) %></strong>
-    <% if message.present? %>
-      <span class="service-alert-message"><%= h(message) %></span>
-    <% end %>
-    <% if link_url.present? %>
-      <a class="service-alert-link" href="<%= h(link_url) %>" target="_blank" rel="noopener noreferrer">Подробнее</a>
-    <% end %>
+  <div class="service-alert-shell">
+    <div class="service-alert-banner service-alert-<%= severity %>">
+
+      <div class="service-alert-banner__body">
+        <div class="service-alert-banner__title-row">
+          <strong class="service-alert-title"><%= h(title) %></strong>
+        </div>
+
+        <% if message.present? %>
+          <div class="service-alert-message"><%= h(message) %></div>
+        <% end %>
+
+        <% if link_url.present? %>
+          <div class="service-alert-link-wrapper">
+            <a class="service-alert-link" href="<%= h(link_url) %>" target="_blank">
+              Подробнее
+            </a>
+          </div>
+        <% end %>
+
+      </div>
+    </div>
   </div>
 
   <% if show_popup %>
@@ -26,14 +45,21 @@
          data-enabled="true"
          data-show-popup="true">
       <div class="service-alert-modal-content service-alert-<%= severity %>">
-        <button type="button" class="service-alert-modal-close" aria-label="Close">×</button>
+
         <h3><%= h(title) %></h3>
-        <p><%= h(message) %></p>
+
+        <% if message.present? %>
+          <p><%= h(message) %></p>
+        <% end %>
+
         <% if link_url.present? %>
           <p>
-            <a href="<%= h(link_url) %>" target="_blank" rel="noopener noreferrer">Подробнее</a>
+            <a href="<%= h(link_url) %>" target="_blank">Подробнее</a>
           </p>
         <% end %>
+
+        <button class="service-alert-modal-dismiss">Понятно</button>
+
       </div>
     </div>
   <% end %>
