@@ -1,37 +1,28 @@
 
 Redmine Service Alert
-
-Minimal incident notification system:
-
-shows a global alert banner in Redmine
-optionally shows a popup (once per browser session/version)
-sends incident start/end notifications to Bitrix24 chat
+Minimal incident notification system
+Global alert banner in Redmine
+Optional popup (once per session/version)
+Bitrix24 notifications
 Scope
-
-This project is intentionally minimal.
-
-Supported:
-
-one active alert at a time
-API-based activation/deactivation
-Redmine banner + optional popup
-Bitrix24 notification via webhook
-
-Not supported:
-
-multiple alerts
-incident history
-scheduling
+Supported
+One active alert
+API activation / deactivation
+Banner + popup
+Bitrix webhook
+Not supported
+Multiple alerts
+History
+Scheduling
 UI editor
-acknowledgements
 Structure
 
-plugins/redmine_service_alert — Redmine plugin
+plugins/redmine_service_alert — plugin
 tools/incident_notifier.py — notifier
 
 Storage
 
-State is stored in:
+State stored in:
 
 Setting.plugin_redmine_service_alert
 
@@ -45,8 +36,7 @@ link_url
 show_popup
 version
 API
-
-Activate:
+Activate
 
 curl -X POST "http://localhost:3000/service_alert/activate
 "
@@ -56,11 +46,10 @@ curl -X POST "http://localhost:3000/service_alert/activate
 "severity": "critical",
 "title": "Service outage",
 "message": "Operations may fail",
-"link_url": "",
 "show_popup": true
 }'
 
-Deactivate:
+Deactivate
 
 curl -X POST "http://localhost:3000/service_alert/deactivate
 "
@@ -68,7 +57,7 @@ curl -X POST "http://localhost:3000/service_alert/deactivate
 -H "X-Service-Alert-Token: TOKEN"
 -d '{}'
 
-Current:
+Current
 
 curl -X GET "http://localhost:3000/service_alert/current
 "
@@ -90,7 +79,7 @@ export REDMINE_ALERT_TOKEN='your-token'
 export BITRIX_WEBHOOK_URL='https://...'
 export BITRIX_DIALOG_ID='chat123'
 
-Start:
+Start
 
 python tools/incident_notifier.py start
 --severity critical
@@ -98,7 +87,7 @@ python tools/incident_notifier.py start
 --message "Operations may fail"
 --show-popup true
 
-End:
+End
 
 python tools/incident_notifier.py end
 --message "Service restored"
@@ -112,15 +101,8 @@ Token
 
 openssl rand -hex 32
 
-UI
-banner when enabled=true
-popup once per version
-sessionStorage used
 Flow
 
-START:
-notifier → activate → banner → popup → Bitrix
-
-END:
-notifier → deactivate → hide → Bitrix
+START → activate → banner → popup → Bitrix
+END → deactivate → hide → Bitrix
 
